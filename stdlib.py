@@ -1,22 +1,27 @@
+from datetime import datetime
 import math
 import os
 import shutil
 import sys
 import time
 
-# e.g. expand_numbers("5,8-11,15")
-# output = [5, 8, 9, 10, 11, 15]
-def expand_numbers(str):
+# e.g. expand_numbers("5,8-11,leela",15)
+# output = [5, 8, 9, 10, 11, "leela", 15]
+# if output_int=False, output = ["5", "8", "9", "10", "11", "leela", "15"]
+def expand_numbers(str, output_int=True):
     res = []
     for token in str.split(","):
         r = token.split("-")
-        if len(r) == 1:
-            res.append(int(r[0]))
-        elif len(r) == 2:
-            for i in range(int(r[0]), int(r[1])+1):
-                res.append(i)
-        else:
-            raise Exception("Invalid numerical string")
+        try:
+            if len(r) == 1:
+                res.append(int(r[0]) if output_int else r[0])
+            elif len(r) == 2:
+                for i in range(int(r[0]), int(r[1])+1):
+                    res.append(i if output_int else str(i))
+            else:
+                raise ValueError("")
+        except ValueError:
+            res.append(token)
     return res
     
 # e.g. make_percentage(1/3, dp=4)
@@ -24,6 +29,13 @@ def expand_numbers(str):
 def make_percentage(p, dp=2):
     m = 10 ** dp
     return math.floor(p*100*m)/m
+    
+# e.g. yyyymmdd(), yyyymm()
+# output = "20201226", "202012"
+def yyyymmdd():
+    return datetime.today().strftime('%Y%m%d')
+def yyyymm():
+    return datetime.today().strftime('%Y%m')
     
 # doesn't move/copy if file already exists in dest
 # also makes directory
@@ -57,6 +69,17 @@ def enum_file(txtfile):
             l = line.strip("\r\n")
             yield l
             
+# e.g. log("Chaos Theory", flag="X")
+# outputs the following to stdout: Sat Dec 26 09:41:39 2020: [X] Chaos Theory
+# Setting f to an open file handle writes to the file instead
+def log(str, f=None, flag=None):
+    str = "{}: {}{}".format(time.ctime(), "" if flag is None else "[{}] ".format(flag), str)
+    if f:
+        f.write(str)
+        f.write("\n")
+    else:
+        print(str)
+
 def test():
     pass
         
